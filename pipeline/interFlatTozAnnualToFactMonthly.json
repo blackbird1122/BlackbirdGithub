@@ -1,0 +1,43 @@
+{
+	"name": "interFlatTozAnnualToFactMonthly",
+	"properties": {
+		"activities": [
+			{
+				"name": "AnnualToMonthly",
+				"type": "SqlServerStoredProcedure",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"storedProcedureName": "[inter].[FlatTozAnnualToFactMonthly]",
+					"storedProcedureParameters": {
+						"p_SeriesType": {
+							"value": {
+								"value": "@pipeline().parameters.p_SeriesType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "bbStagingSQLConnection",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"p_SeriesType": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

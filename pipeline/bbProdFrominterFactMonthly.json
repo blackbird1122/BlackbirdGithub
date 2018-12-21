@@ -1,0 +1,43 @@
+{
+	"name": "bbProdFrominterFactMonthly",
+	"properties": {
+		"activities": [
+			{
+				"name": "LoadsbbProduction",
+				"type": "SqlServerStoredProcedure",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"storedProcedureName": "[bbbi].[FactMonthlyTobbProduction]",
+					"storedProcedureParameters": {
+						"p_SeriesType": {
+							"value": {
+								"value": "@pipeline().parameters.p_SeriesType",
+								"type": "Expression"
+							},
+							"type": "String"
+						}
+					}
+				},
+				"linkedServiceName": {
+					"referenceName": "bbProductionSQLConnection",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"p_SeriesType": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

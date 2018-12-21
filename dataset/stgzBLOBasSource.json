@@ -1,0 +1,40 @@
+{
+	"name": "stgzBLOBasSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "bbbistorageConnection",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"blob_folder": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIAdatasets"
+		},
+		"type": "AzureBlob",
+		"structure": [
+			{
+				"name": "series",
+				"type": "String"
+			},
+			{
+				"name": "request.series_id",
+				"type": "String"
+			}
+		],
+		"typeProperties": {
+			"format": {
+				"type": "JsonFormat",
+				"filePattern": "setOfObjects"
+			},
+			"fileName": "*.*",
+			"folderPath": {
+				"value": "@concat( 'bbeia/', dataset().blob_folder)",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,138 @@
+{
+	"name": "stgJSONSFlatten",
+	"properties": {
+		"activities": [
+			{
+				"name": "LookupJSONImportSeries",
+				"type": "Lookup",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "SqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT Series_ID,Series_Type ,JSON_Data FROM [stg].[JSONSImport] WHERE Flattened_Success_Ind=''N'' AND Series_Type=''', pipeline().parameters.series_type,'''')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "stgJASONSImportasaSource",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ForEachSeries",
+				"type": "ForEach",
+				"dependsOn": [
+					{
+						"activity": "LookupJSONImportSeries",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"items": {
+						"value": "@activity('LookupJSONImportSeries').output.value",
+						"type": "Expression"
+					},
+					"isSequential": true,
+					"activities": [
+						{
+							"name": "Flatten",
+							"type": "SqlServerStoredProcedure",
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"storedProcedureName": "[stg].[JSONSFlatten]",
+								"storedProcedureParameters": {
+									"p_JSON_Data": {
+										"value": {
+											"value": "@item().JSON_Data",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"p_Series_ID": {
+										"value": {
+											"value": "@item().Series_ID",
+											"type": "Expression"
+										},
+										"type": "String"
+									},
+									"p_Series_Type": {
+										"value": {
+											"value": "@item().Series_Type",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "bbStagingSQLConnection",
+								"type": "LinkedServiceReference"
+							}
+						},
+						{
+							"name": "FlatSuccessInd",
+							"type": "SqlServerStoredProcedure",
+							"dependsOn": [
+								{
+									"activity": "Flatten",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"storedProcedureName": "[stg].[JSONSFlat_SuccessInd]",
+								"storedProcedureParameters": {
+									"p_Series_ID": {
+										"value": {
+											"value": "@item().Series_ID",
+											"type": "Expression"
+										},
+										"type": "String"
+									}
+								}
+							},
+							"linkedServiceName": {
+								"referenceName": "bbStagingSQLConnection",
+								"type": "LinkedServiceReference"
+							}
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"series_type": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

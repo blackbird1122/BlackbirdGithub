@@ -1,0 +1,79 @@
+{
+	"name": "wForEachSeriesID",
+	"properties": {
+		"activities": [
+			{
+				"name": "ForEachSeriesID",
+				"type": "ForEach",
+				"typeProperties": {
+					"items": {
+						"value": "@pipeline().parameters.series_list",
+						"type": "Expression"
+					},
+					"activities": [
+						{
+							"name": "CopyHTTPURLtoBLOB",
+							"type": "Copy",
+							"policy": {
+								"timeout": "7.00:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"typeProperties": {
+								"source": {
+									"type": "HttpSource",
+									"httpRequestTimeout": "00:01:40"
+								},
+								"sink": {
+									"type": "BlobSink"
+								},
+								"enableStaging": false,
+								"dataIntegrationUnits": 0
+							},
+							"inputs": [
+								{
+									"referenceName": "wwHTTPasSource",
+									"type": "DatasetReference",
+									"parameters": {
+										"api_key": "1411ac7190b15eaa6f324240f2c5d459",
+										"series_id": {
+											"value": "@item().Series_ID",
+											"type": "Expression"
+										}
+									}
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "wBLOBasSink",
+									"type": "DatasetReference",
+									"parameters": {
+										"target_folder": {
+											"value": "@concat('bbeia/',item().bbSeriesType)",
+											"type": "Expression"
+										},
+										"file_name": {
+											"value": "@{item().Series_ID}",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						}
+					]
+				}
+			}
+		],
+		"parameters": {
+			"series_list": {
+				"type": "Array"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

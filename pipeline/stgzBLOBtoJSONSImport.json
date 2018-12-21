@@ -1,0 +1,94 @@
+{
+	"name": "stgzBLOBtoJSONSImport",
+	"properties": {
+		"activities": [
+			{
+				"name": "CopyBLOBStoJSONSImport",
+				"type": "Copy",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "BlobSource",
+						"recursive": true
+					},
+					"sink": {
+						"type": "SqlSink",
+						"writeBatchSize": 10000,
+						"preCopyScript": {
+							"value": "@concat('DELETE FROM  STG.JSONSImport where series_type= ''',pipeline().parameters.series_type,'''')",
+							"type": "Expression"
+						}
+					},
+					"enableStaging": false,
+					"dataIntegrationUnits": 0,
+					"translator": {
+						"type": "TabularTranslator",
+						"columnMappings": {
+							"request.series_id": "Series_ID",
+							"series": "JSON_Data"
+						}
+					}
+				},
+				"inputs": [
+					{
+						"referenceName": "stgzBLOBasSource",
+						"type": "DatasetReference",
+						"parameters": {
+							"blob_folder": {
+								"value": "@pipeline().parameters.series_type",
+								"type": "Expression"
+							}
+						}
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "stgJSONSImportasSink",
+						"type": "DatasetReference"
+					}
+				]
+			},
+			{
+				"name": "JSONSImportSeriesType",
+				"type": "SqlServerStoredProcedure",
+				"dependsOn": [
+					{
+						"activity": "CopyBLOBStoJSONSImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"storedProcedureName": "[stg].[JSONSImport_SeriesType]"
+				},
+				"linkedServiceName": {
+					"referenceName": "bbStagingSQLConnection",
+					"type": "LinkedServiceReference"
+				}
+			}
+		],
+		"parameters": {
+			"series_type": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,55 @@
+{
+	"name": "zzLkpEIASeriesAsSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "bbStagingSQLConnection",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bbEIAdatasets"
+		},
+		"type": "AzureSqlTable",
+		"structure": [
+			{
+				"name": "SourceKey",
+				"type": "String"
+			},
+			{
+				"name": "Area",
+				"type": "String"
+			},
+			{
+				"name": "Series_ID",
+				"type": "String"
+			},
+			{
+				"name": "GetDataIndicator",
+				"type": "String"
+			},
+			{
+				"name": "bbSeriesType",
+				"type": "String"
+			},
+			{
+				"name": "bbProductLongName",
+				"type": "String"
+			},
+			{
+				"name": "bbUnits",
+				"type": "String"
+			},
+			{
+				"name": "bbFrequency",
+				"type": "String"
+			},
+			{
+				"name": "bbSDCategoryLongName",
+				"type": "String"
+			}
+		],
+		"typeProperties": {
+			"tableName": "[lkp].[EIASeries]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

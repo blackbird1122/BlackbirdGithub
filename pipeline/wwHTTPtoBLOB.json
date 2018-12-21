@@ -1,0 +1,93 @@
+{
+	"name": "wwHTTPtoBLOB",
+	"properties": {
+		"activities": [
+			{
+				"name": "GetSeriesfromSQLLkpEIA",
+				"type": "Lookup",
+				"dependsOn": [
+					{
+						"activity": "WebActivityDeleteBLOBFolders",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"source": {
+						"type": "SqlSource",
+						"sqlReaderQuery": {
+							"value": "@concat('SELECT bbSeriesType ,Series_ID FROM [lkp].[EIASeries] where GetDataIndicator =''Y'' and bbSeriesType=''', pipeline().parameters.SeriesType,'''')",
+							"type": "Expression"
+						}
+					},
+					"dataset": {
+						"referenceName": "wLkpEIAasSource",
+						"type": "DatasetReference"
+					},
+					"firstRowOnly": false
+				}
+			},
+			{
+				"name": "ExecuteForEach_Pipeline",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "GetSeriesfromSQLLkpEIA",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "wForEachSeriesID",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"series_list": {
+							"value": "@activity('GetSeriesfromSQLLkpEIA').output.value",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "WebActivityDeleteBLOBFolders",
+				"type": "WebActivity",
+				"policy": {
+					"timeout": "7.00:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"typeProperties": {
+					"url": "https://prod-20.westcentralus.logic.azure.com:443/workflows/389470a441a24b3fab55a4f26cce391c/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=uR_-TTNfoBRKtRKE_ToOOc_ihYHcK9c8ERp-mZ95nrw",
+					"method": "POST",
+					"body": {
+						"value": "@concat('{\"SeriesType\":\"',pipeline().parameters.SeriesType,'\"}')",
+						"type": "Expression"
+					}
+				}
+			}
+		],
+		"parameters": {
+			"SeriesType": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

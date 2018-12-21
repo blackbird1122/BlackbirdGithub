@@ -1,0 +1,133 @@
+{
+	"name": "aaAllPipeMonthly",
+	"properties": {
+		"activities": [
+			{
+				"name": "HTTP",
+				"type": "ExecutePipeline",
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "wwHTTPtoBLOB",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"SeriesType": {
+							"value": "@pipeline().parameters.SeriesType",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "stgzBLOBtoJSONSImport",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "HTTP",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "stgzBLOBtoJSONSImport",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"series_type": {
+							"value": "@pipeline().parameters.SeriesType",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "stgJSONSFlatten",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "stgzBLOBtoJSONSImport",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "stgJSONSFlatten",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"series_type": {
+							"value": "@pipeline().parameters.SeriesType",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "interFlatToFactMonthly",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "stgJSONSFlatten",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "interFlatToFactMonthly",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_SeriesType": {
+							"value": "@pipeline().parameters.SeriesType",
+							"type": "Expression"
+						}
+					}
+				}
+			},
+			{
+				"name": "bbProdFrominterFactMonthly",
+				"type": "ExecutePipeline",
+				"dependsOn": [
+					{
+						"activity": "interFlatToFactMonthly",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"typeProperties": {
+					"pipeline": {
+						"referenceName": "bbProdFrominterFactMonthly",
+						"type": "PipelineReference"
+					},
+					"waitOnCompletion": true,
+					"parameters": {
+						"p_SeriesType": {
+							"value": "@pipeline().parameters.SeriesType",
+							"type": "Expression"
+						}
+					}
+				}
+			}
+		],
+		"parameters": {
+			"SeriesType": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIApipelines"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

@@ -1,0 +1,36 @@
+{
+	"name": "wBLOBasSink",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "bbbistorageConnection",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"target_folder": {
+				"type": "String"
+			},
+			"file_name": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "bbEIAdatasets"
+		},
+		"type": "AzureBlob",
+		"typeProperties": {
+			"format": {
+				"type": "JsonFormat",
+				"filePattern": "setOfObjects"
+			},
+			"fileName": {
+				"value": "@dataset().file_name",
+				"type": "Expression"
+			},
+			"folderPath": {
+				"value": "@dataset().target_folder",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

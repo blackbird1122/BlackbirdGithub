@@ -1,0 +1,10 @@
+{
+	"name": "bbStagingSQLConnection",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureSqlDatabase",
+		"typeProperties": {
+			"connectionString": "Integrated Security=False;Encrypt=True;Connection Timeout=30;Data Source=blackbirdbi.database.windows.net;Initial Catalog=bbStaging;User ID=bbServerGuest;Password=bbguest184!77p"
+		}
+	}
+}

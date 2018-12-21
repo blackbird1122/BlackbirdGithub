@@ -1,0 +1,10 @@
+{
+	"name": "bbbistorageConnection",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"type": "AzureBlobStorage",
+		"typeProperties": {
+			"connectionString": "DefaultEndpointsProtocol=https;AccountName=bbbistorage;AccountKey=ree2VnVrL5n878TT6SElnCGYjZdpXB+SfGHGlrv1LxEd/HnjfxKOc/LyRhHUNAFzJbDn66OncAYUwDaeJvFHPg==;EndpointSuffix=core.windows.net;"
+		}
+	}
+}

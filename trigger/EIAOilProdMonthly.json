@@ -1,0 +1,37 @@
+{
+	"name": "EIAOilProdMonthly",
+	"properties": {
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "aaAllPipeMonthly",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"SeriesType": "OilProdMonthly"
+				}
+			}
+		],
+		"type": "ScheduleTrigger",
+		"typeProperties": {
+			"recurrence": {
+				"frequency": "Month",
+				"interval": 1,
+				"startTime": "2018-12-20T19:58:00Z",
+				"timeZone": "UTC",
+				"schedule": {
+					"minutes": [
+						0
+					],
+					"hours": [
+						20
+					],
+					"monthDays": [
+						20
+					]
+				}
+			}
+		}
+	}
+}

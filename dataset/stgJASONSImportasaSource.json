@@ -1,0 +1,27 @@
+{
+	"name": "stgJASONSImportasaSource",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "bbStagingSQLConnection",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "bbEIAdatasets"
+		},
+		"type": "AzureSqlTable",
+		"structure": [
+			{
+				"name": "Series_ID",
+				"type": "String"
+			},
+			{
+				"name": "JSON_Data",
+				"type": "String"
+			}
+		],
+		"typeProperties": {
+			"tableName": "[stg].[JSONSImport]"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
